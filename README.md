@@ -175,3 +175,4 @@ Chạy notebook `msit-open-world.ipynb` để chạy kiểm thử quy trình 3 g
 2. **WOAM Benchmark:** *Open-World Attribute Mining from E-Commerce Product Text*.
 3. **OAMine Benchmark:** *Open-World Product Attribute Mining*.
 4. **Qwen2.5-VL / LLaVA:** Vision-Language Foundation Models.
+
