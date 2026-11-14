@@ -80,29 +80,10 @@ Quy trình CoT ép mô hình kiểm chứng chéo thông tin qua 5 bước:
 2. **Stage 2 - Filtering Repeated Attributes:** Lọc thuộc tính trùng lặp ngữ nghĩa dựa trên quy tắc và độ tương đồng Cosine qua Word2Vec (`word2vec-google-news-300`).
 3. **Stage 3 - Sequential Inference with 5-Step CoT:** Chạy quy trình 5 bước CoT cho từng thuộc tính còn lại để loại bỏ dương tính giả (false positives).
 
----
-
-## 📊 4. Thiết lập thực nghiệm & Kết quả
-
-### Cài đặt thực nghiệm:
-- **Tập dữ liệu:**
-  - **WOAM:** 4 danh mục sản phẩm, trung bình ~16.5 thuộc tính/loại.
-  - **OAMine:** 100 danh mục sản phẩm, 1,943 sản phẩm test.
-  - Ảnh crawl từ Amazon tương ứng với ASIN.
-  - Tập huấn luyện: 1,000 mẫu AGTD + 300 mẫu CTTD; Tập kiểm thử: 1,000 mẫu.
-- **Mô hình nền tảng:** LLaVA-7B, Qwen-VL (Qwen2.5-VL-7B-Instruct), InternLM.
-- **Phương pháp tinh chỉnh:** LoRA (PEFT), Optimizer Adam, learning rate $3 \times 10^{-4}$, 10 epochs.
-- **Cấu hình Decoding:** Top_p sampling ($p=0.7$, temperature=0.2).
-
-### Kết quả nổi bật:
-- **Vượt trội SOTA & GPT-4:** Trên WOAM & OAMine, Exact Match Precision của MSIT-LLaVA-7B đạt **35.34%** (tăng mạnh từ 10.61% của LLaVA-7B gốc), bỏ xa GPT-4 (15.51%).
-- **Hiệu quả tự sửa lỗi:** Cơ chế Self-Correction sửa đúng tới **98.6%** các phán đoán âm tính ban đầu.
-- **Domain Adaptation:** Thử nghiệm Cross-Validation trên các danh mục hoàn toàn mới (*Sofa, Phone, Tea, Vitamin*), MSIT dẫn đầu tuyệt đối với Similar Match Precision đạt **69.21%** và Exact Match Precision đạt **40.96%**.
-- **Sức mạnh kênh Ảnh:** Kênh ảnh đạt Exact Match Precision 40.96% (so với GPT-4 là 23.81%), cung cấp số lượng thuộc tính phong phú in trên bao bì mà text bỏ sót.
 
 ---
 
-## 📂 5. Cấu trúc thư mục dự án
+## 📂 4. Cấu trúc thư mục dự án
 
 ```plaintext
 msit-reproduction/
@@ -114,22 +95,22 @@ msit-reproduction/
 ├── data_generation.py          # Pipeline sinh dữ liệu AGTD và CTTD từ LLM/VLM
 ├── datasets.py                 # Xử lý và đọc dữ liệu WOAM / OAMine
 ├── image_collection.py         # Module crawl/tải ảnh sản phẩm từ Amazon
-├── fine-tune-msit-open-world.ipynb # Notebook huấn luyện LoRA cho VLM
-├── msit-open-world.ipynb       # Notebook suy luận và đánh giá toàn diện pipeline
+├── fine-tune-msit-open-world.ipynb # Notebook suy luận và đánh giá toàn diện pipeline
+├── msit-open-world.ipynb       # Notebook huấn luyện LoRA cho VLM
 ├── msit_pipeline_results.jsonl # Kết quả chạy pipeline chi tiết
 ├── datasets/                   # Dữ liệu phục vụ nghiên cứu
 │   ├── images/                 # Ảnh sản phẩm Amazon đã thu thập
 │   ├── oamine/                 # Dữ liệu gốc và nhãn OAMine
 │   ├── sft_datasets/           # Dữ liệu SFT sau khi đóng gói
 │   └── woam/                   # Dữ liệu benchmark WOAM
-└── results/                    # Checkpoints, AGTD/CTTD splits và logs thực nghiệm
+└── results/                    # Logs thực nghiệm
 ```
 
 ---
 
-## 🚀 6. Hướng dẫn cài đặt & Thực thi
+## 🚀 5. Hướng dẫn cài đặt & Thực thi
 
-### 6.1. Cài đặt môi trường
+### 5.1. Cài đặt môi trường
 Khuyến nghị sử dụng Python 3.10+ và môi trường ảo:
 
 ```bash
@@ -145,31 +126,31 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 6.2. Thu thập dữ liệu ảnh
+### 5.2. Thu thập dữ liệu ảnh
 Tải ảnh sản phẩm Amazon tương ứng với tập dữ liệu:
 ```bash
 python image_collection.py
 ```
 
-### 6.3. Sinh dữ liệu tinh chỉnh (AGTD & CTTD)
+### 5.3. Sinh dữ liệu tinh chỉnh (AGTD & CTTD)
 Sinh dữ liệu trích xuất thuộc tính độc lập và chuỗi CoT 5 bước:
 ```bash
 python data_generation.py
 python build_sft_data.py
 ```
 
-### 6.4. Huấn luyện mô hình (Fine-tuning)
-Mở và thực thi notebook `fine-tune-msit-open-world.ipynb` trên môi trường hỗ trợ GPU (Google Colab / Kaggle / Server GPU riêng) để fine-tune LoRA với Qwen2.5-VL hoặc LLaVA.
+### 5.4. Huấn luyện mô hình (Fine-tuning)
+Chạy notebook `msit-open-world.ipynb` trên môi trường hỗ trợ GPU (Google Colab / Kaggle / Server GPU riêng) để fine-tune LoRA với Qwen2.5-VL hoặc LLaVA.
 
-### 6.5. Đánh giá & Suy luận (Inference Pipeline)
-Chạy notebook `msit-open-world.ipynb` để chạy kiểm thử quy trình 3 giai đoạn:
+### 5.5. Đánh giá & Suy luận (Inference Pipeline)
+Chạy notebook `fine-tune-msit-open-world.ipynb` trên môi trường hỗ trợ GPU (Google Colab / Kaggle / Server GPU riêng) để chạy kiểm thử quy trình 3 giai đoạn và đánh giá kết quả:
 1. Batch Attribute Generation
 2. Filtering Repeated Attributes (Word2Vec)
 3. Sequential 5-step CoT Inference
 
 ---
 
-## 📚 7. Tài liệu tham khảo
+## 📚 6. Tài liệu tham khảo
 
 1. **MSIT Paper:** *Open-World Attribute Mining for E-Commerce Products with Multimodal Self-Correction Instruction Tuning*, ACL 2025 (Volume 1: Long Papers).
 2. **WOAM Benchmark:** *Open-World Attribute Mining from E-Commerce Product Text*.
